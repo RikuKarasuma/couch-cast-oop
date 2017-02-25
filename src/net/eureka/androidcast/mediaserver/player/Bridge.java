@@ -8,12 +8,14 @@ import java.net.Socket;
 
 import net.eureka.androidcast.Logger;
 import net.eureka.androidcast.foundation.config.Configuration;
+import net.eureka.androidcast.foundation.init.NetworkGlobals;
 import net.eureka.androidcast.player.MediaPlayer;
 import net.eureka.androidcast.player.Static;
 
 public final class Bridge
 {
-	private static final int PORT = 63054;
+	
+	private static final int PORT = 63054, TIMEOUT = 4000, CONNECTION_BACKLOG = 100;
 	
 	private static ServerSocket server = null;
 	
@@ -35,7 +37,8 @@ public final class Bridge
 	{
 		try
 		{
-			server = new ServerSocket(PORT);
+			server = new ServerSocket(PORT, CONNECTION_BACKLOG, NetworkGlobals.getDHCPInterface());
+			server.setSoTimeout(TIMEOUT);
 		}
 		catch (IOException e) 
 		{
@@ -139,10 +142,13 @@ public final class Bridge
 		}
 		
 		
+		/////////////////////// Synchronisation ERROR in Input bridge thread.
+		
 		private static void inputProcessingThread()
 		{
 			new Thread(new Runnable()
 			{
+				
 				
 				@Override
 				public void run() 
@@ -176,13 +182,13 @@ public final class Bridge
 				System.out.println("Inputing...");
 				// Read the first two bytes into array.
 				bytes_read = input.read(read, 0, BUFFER_SIZE);
-				Logger.append(new StringBuffer("Bytes read: "+read[0] +", "+read[1]));
+				//Logger.append(new StringBuffer("Bytes read: "+read[0] +", "+read[1]));
 				System.out.println("Bytes read: "+read[0] +", "+read[1]);
 				// Check for file associated with command. NOTE: Would only happen if command was PLAY_FILE_SEQUENCE.
 				checkForFilePath();
 				//System.out.println("");
 				// Check for string associated with command. NOTE: Would only happen if command was PLAY_TUBE_SEQUENCE.
-				checkForMRL();
+				//checkForMRL();
 				//System.out.println("Path:"+path);
 			}
 			catch (ClassNotFoundException e)
@@ -334,8 +340,10 @@ public final class Bridge
 		{
 			// If command is enabled to run and media player not null....
 			if(runCommand && player != null)
-				// Skip to location in media.
-				player.skip(percentage);
+				synchronized (player) {
+					// Skip to location in media.
+					player.skip(percentage);
+				}
 		}
 		
 		/**
@@ -345,8 +353,10 @@ public final class Bridge
 		{
 			// If command is enabled to run and media player not null....
 			if(runCommand && player != null)
-				// Enable/Disable fast forward.
-				player.forward();
+				synchronized (player) {
+					// Enable/Disable fast forward.
+					player.forward();
+				}
 		}
 		
 		/**
@@ -356,8 +366,10 @@ public final class Bridge
 		{
 			// If command is enabled to run and media player not null....
 			if(runCommand && player != null)
-				// Skip back five seconds.
-				player.rewind();
+				synchronized (player) {
+					// Skip back five seconds.
+					player.rewind();
+				}
 		}
 		
 		/**
@@ -370,8 +382,10 @@ public final class Bridge
 			{
 				// If media file not null....
 				if(path != null)
-					// Run media file.
-					player.play(path.toCharArray(), index);
+					synchronized (player) {
+						// Run media file.
+						player.play(path.toCharArray(), index);
+					}
 			}
 		}
 		
@@ -383,6 +397,7 @@ public final class Bridge
 		{
 			System.out.println("Starting mrl:"+mrl);
 			if(player == null)
+				
 				player = new MediaPlayer();
 			if(mrl != null)
 				player.play(mrl);
@@ -397,8 +412,10 @@ public final class Bridge
 			if(runCommand && player != null)
 				try
 				{
-					// Pause/play media.
-					player.pauseOrPlay();
+					synchronized (player) {
+						// Pause/play media.
+						player.pauseOrPlay();
+					}
 				}
 				catch (Exception e)
 				{
@@ -414,8 +431,10 @@ public final class Bridge
 		{
 			// If command is enabled to run and media player not null....
 			if(runCommand && player != null)
-				// Stop currently playing media.
-				player.stop();
+				synchronized (player) {
+					// Stop currently playing media.
+					player.stop();
+				}
 		}
 		
 		/**
@@ -426,20 +445,26 @@ public final class Bridge
 		{
 			// If command is enabled to run and media player not null....
 			if(runCommand && player != null)
-				// Adjust volume.
-				player.volume(volume_level);
+				synchronized (player) {
+					// Adjust volume.
+					player.volume(volume_level);
+				}
 		}
 		
 		private static void setVideoInvisible()
 		{
 			if(runCommand && player != null)
-				player.setFrameInvisible();
+				synchronized (player) {
+					player.setFrameInvisible();
+				}
 		}
 		
 		private static void setVideoVisible()
 		{
 			if(runCommand && player != null)
-				player.setFrameActive();
+				synchronized (player) {
+					player.setFrameActive();
+				}
 		}
 		
 		/**
@@ -465,6 +490,7 @@ public final class Bridge
 		 * will be sent through the stream straight after the command. The string will be read and kept for use in running the command.
 		 * @throws IOException
 		 */
+		@SuppressWarnings("unused")
 		private static void checkForMRL() throws IOException
 		{
 			Logger.append(new StringBuffer("Checking for MRL path..."));

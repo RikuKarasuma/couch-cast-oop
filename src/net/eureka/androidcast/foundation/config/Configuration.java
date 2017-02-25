@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import net.eureka.androidcast.Logger;
+import net.eureka.androidcast.player.Static;
 import net.eureka.androidcast.foundation.init.ApplicationGlobals;
+import net.eureka.androidcast.foundation.init.NetworkGlobals;
 
 
 /**
@@ -62,15 +64,23 @@ public final class Configuration
 			buffered_reader.readLine();
 			// Ignore server name.
 			buffered_reader.readLine();
-			// Ignore download directory.
+			// Ignore media directory.
 			buffered_reader.readLine();
 			// Ignore process id line.
 			buffered_reader.readLine();
 			// Get is minimised
 			boolean is_minimized = Boolean.parseBoolean(buffered_reader.readLine());
-			// Ignore line.
+			// Ignore deep search.
 			buffered_reader.readLine();
 			boolean is_music_mode = Boolean.parseBoolean(buffered_reader.readLine());
+			// Ignore file/folder search delay.
+			buffered_reader.readLine();
+			// Ignore update media delay.
+			buffered_reader.readLine();
+			// Get name of network interface.
+			String network_interface_name = buffered_reader.readLine();
+			// Set DHCP interface and name.
+			NetworkGlobals.setDhcpNetwork(Static.getInetAddressFromName(network_interface_name));
 			// Set minimised.
 			ApplicationGlobals.setMinimizeWindows(is_minimized);
 			ApplicationGlobals.setMusicMode(is_music_mode);
@@ -99,7 +109,7 @@ public final class Configuration
 		home_path = ((home_path == null) ? System.getenv("HOMEPATH") : home_path);
 		
 		// Create default home/download directory path. 
-		final StringBuffer directory_path = new StringBuffer(system_drive+home_path+File.separator+"Android Cast"+File.separator);
+		final StringBuffer directory_path = new StringBuffer(system_drive+home_path+File.separator+ApplicationGlobals.getName()+File.separator);
 		return new File(directory_path+CONFIG_FILE.toString());
 	}
 }

@@ -162,10 +162,10 @@ public final class MediaInfo implements Serializable
 	}
 
 	/**
-	 * Integer used to determine the index of the playing media file on each play-list.
+	 * Short used to determine the index of the playing media file on each play-list.
 	 * This is useful for highlighting the selected playing media on the client side as
 	 * well as retrieving the media name from within the play-list.
-	 * @return Integer - Short used for media highlighting.
+	 * @return Short - Short used for media highlighting.
 	 */
 	public int getIndex() 
 	{
@@ -174,11 +174,11 @@ public final class MediaInfo implements Serializable
 
 	
 	/**
-	 * Integer used to determine the index of the playing media file on each play-list.
+	 * Short used to determine the index of the playing media file on each play-list.
 	 * This is useful for highlighting the selected playing media on the client side.
-	 * @param Integer index - Short used for media highlighting.
+	 * @param Short index - Short used for media highlighting.
 	 */
-	public void setIndex(short index) 
+	public void setIndex(int index) 
 	{
 		this.index = index;
 	}

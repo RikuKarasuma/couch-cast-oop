@@ -1,6 +1,7 @@
 package net.eureka.androidcast.player;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -12,7 +13,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -21,8 +21,6 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
-import com.sun.jna.NativeLibrary;
 
 import net.eureka.androidcast.foundation.init.ApplicationGlobals;
 import net.eureka.androidcast.mediaserver.player.MediaInfo;
@@ -34,10 +32,10 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.windows.Win32FullScreenStrategy;
-import uk.co.caprica.vlcj.runtime.RuntimeUtil;
-import uk.co.caprica.vlcj.runtime.windows.WindowsRuntimeUtil;
 
 /**
+ * *** BE AWARE THE SUMMARY DOC HERE IS VASTLY OUTDATED, THE NOTES ARE STILL VALID THOUGH. 
+ * 
  * VLC implemented media player object. Instantiated when {@link MediaReceiver} server socket has binded. 
  * Handles the creation of the full-screen canvas, media player functions/controls and the updating of 
  * media player info through a TimerTask/{@link Timer} scheduled to run every one second.
@@ -380,7 +378,7 @@ public final class MediaPlayer extends TimerTask
 	 * {@link MediaInfo} object. Contains all the relevant media info that needs to be transported to the Android 
 	 * client via the {@link MediaBroadcaster}. 
 	 */
-	private static MediaInfo info = null;
+	private static MediaInfo info = new MediaInfo(0, 0);
 	
 	/**
 	 * {@link Timer} that manages this media players TimerTask. Used to update media info every one second.
@@ -501,8 +499,9 @@ public final class MediaPlayer extends TimerTask
 		
 		try
 		{
-			String image_location = ApplicationGlobals.getInstallPath() + "wall_logo.png";
-			System.out.println(image_location);
+			
+			String  image_name = "window_logo.png",
+					image_location = ApplicationGlobals.getInstallPath() + image_name;
 			
 			overlayImage = new ImageIcon(image_location).getImage();
 			//if(overlayImage == null)
@@ -541,13 +540,18 @@ public final class MediaPlayer extends TimerTask
 		Canvas canvas = new Canvas()
 		{
 			private static final long serialVersionUID = 2414466573758080014L;
+			private static final String LOGO_NAME = "logo_text_huge.png";
+			private final Image LOGO_IMAGE = new ImageIcon(ApplicationGlobals.getInstallPath() + LOGO_NAME).getImage();
 			
 			@Override
 			public void paint(Graphics g) 
 			{
 				try
 				{
-					g.drawImage(overlayImage, 0, 0, this.getWidth(), this.getHeight(), null);
+					g.setColor(Color.black);
+					g.fillRect(0, 0, this.getWidth(), this.getHeight());
+					g.drawImage(overlayImage, 0, (this.getHeight()-585), null);
+					g.drawImage(LOGO_IMAGE, (this.getWidth()/2 - 350), (this.getHeight()/2-37), null);
 				}
 				catch(Exception e)
 				{
@@ -694,7 +698,7 @@ public final class MediaPlayer extends TimerTask
 	 * Updates media info every one second. First it updates the media time, then updates the {@link MediaInfo} object.
 	 * Which is sent to Android client by the {@link MediaBroadcaster}.
 	 */
-	public synchronized void updateMediaInfo()
+	public void updateMediaInfo()
 	{
 		if(ourMediaPlayer != null && ourMediaPlayer.isPlayable())
 		{
@@ -714,42 +718,46 @@ public final class MediaPlayer extends TimerTask
 	{
 		try
 		{
-			// If the media info object is equal to null...
-			if(info == null)
-				// Create a new media info object with initial length, current length and name.
-				info = new MediaInfo(ourMediaPlayer.getMediaMeta().getLength(), time);
-			// If the media info object is already created...
-			else
+			synchronized (info) 
 			{
-				//System.out.println("Updating time...");
-				// Update length of the media.
-				info.setLength(ourMediaPlayer.getMediaMeta().getLength());
-				// Update current length of the media.
-				info.setTime(time);
-			}
-			short index;
-			if(!streaming)
-			{
-				// Check if the media player is finished. If so reset the index to -1 (Signalling nothing is playing).
-				// If not update the media index.
-				index = (short) ((finished) ? -1 : mediaIndex);
-			}
-			else
-				index = -2;
+				// If the media info object is equal to null...
+				if(info == null)
+					// Create a new media info object with initial length, current length and name.
+					info = new MediaInfo(ourMediaPlayer.getMediaMeta().getLength(), time);
+				// If the media info object is already created...
+				else
+				{
+					//System.out.println("Updating time...");
+					// Update length of the media.
+					info.setLength(ourMediaPlayer.getMediaMeta().getLength());
+					// Update current length of the media.
+					info.setTime(time);
+				}
+				short index;
+				if(!streaming)
+				{
+					// Check if the media player is finished. If so reset the index to -1 (Signalling nothing is playing).
+					// If not update the media index.
+					index = (short) ((finished) ? -1 : mediaIndex);
+				}
+				else
+					// I believe this was for the experimental YouTube streaming state.
+					index = -2;
+					
+				// Set media index.
+				info.setIndex(index);
+				// Update media fast forward.
+				info.setForward(isFastFoward());
+				// Update media playing.
+				info.setPlaying(isPlaying());
+				// Update current volume.
+				info.setVolume((byte)(ourMediaPlayer.getVolume()/2));
+				if(ApplicationGlobals.isMusicMode())
+					info.setMusic(true);
+				else
+					info.setMusic(false);
 				
-			// Set media index.
-			info.setIndex(index);
-			// Update media fast forward.
-			info.setForward(isFastFoward());
-			// Update media playing.
-			info.setPlaying(isPlaying());
-			// Update current volume.
-			info.setVolume((byte)(ourMediaPlayer.getVolume()/2));
-			if(ApplicationGlobals.isMusicMode())
-				info.setMusic(true);
-			else
-				info.setMusic(false);
-			//System.out.println("Updated.");
+			}
 		}
 		catch(Exception e)
 		{
@@ -777,8 +785,12 @@ public final class MediaPlayer extends TimerTask
 				// retrieve the time-stamp from the media player.
 				time = this.ourMediaPlayer.getTime();
 			
-			if(streaming && info != null && !preparing && !streaming_preparing && (time >= info.getLength()))
-				this.stop();
+			
+			synchronized (info)
+			{
+				if(streaming && info != null && !preparing && !streaming_preparing && (time >= info.getLength()))
+					this.stop();
+			}
 				
 		}
 	}
@@ -789,7 +801,7 @@ public final class MediaPlayer extends TimerTask
 	 * is activated and if so disables it.
 	 *  
 	 */
-	public synchronized void pauseOrPlay()
+	public void pauseOrPlay()
 	{
 		// Check if media player is fast forward enabled.
 		this.checkFastForward();
@@ -951,7 +963,10 @@ public final class MediaPlayer extends TimerTask
 		streaming = false;
 		streaming_preparing = false;
 		// Nullify current media info.
-		info = null;
+		synchronized (info) 
+		{
+			info = null;
+		}
 		// Reset VLCJ resources.
 		ourMediaPlayer.removeMediaPlayerEventListener(eventListener);
 		ourMediaPlayer.setVideoSurface(null);
@@ -967,7 +982,7 @@ public final class MediaPlayer extends TimerTask
 	/**
 	 * Enables/Disables fast forward. 
 	 */
-	public synchronized void forward()
+	public void forward()
 	{
 		// If the media player is not paused...
 		if(!paused && ourMediaPlayer != null)
@@ -986,7 +1001,7 @@ public final class MediaPlayer extends TimerTask
 	/**
 	 * Rewinds current media by five seconds and re-syncs time.
 	 */
-	public synchronized void rewind()
+	public void rewind()
 	{
 		if(ourMediaPlayer != null)
 		{
@@ -1003,7 +1018,7 @@ public final class MediaPlayer extends TimerTask
 	 *  
 	 * @param Integer percentage_to_skip - Percentage of the time to skip to. (MAX:100%)
 	 */
-	public synchronized void skip(int percentage_to_skip)
+	public void skip(int percentage_to_skip)
 	{
 		// If the media player is playable...
 		if(ourMediaPlayer != null && ourMediaPlayer.isPlayable())
@@ -1022,8 +1037,11 @@ public final class MediaPlayer extends TimerTask
 	{
 		// Set status to paused.
 		paused = true;
-		// Update media info.
-		info.setPlaying(paused);
+		synchronized (info) 
+		{
+			// Update media info.
+			info.setPlaying(paused);
+		}
 	}
 	
 	/**
@@ -1033,8 +1051,11 @@ public final class MediaPlayer extends TimerTask
 	{
 		// Set status to playing.
 		paused = false;
-		// Update media info.
-		info.setPlaying(paused);
+		synchronized (info) 
+		{
+			// Update media info.
+			info.setPlaying(paused);
+		}
 	}
 	
 	/**
@@ -1042,7 +1063,7 @@ public final class MediaPlayer extends TimerTask
 	 * 
 	 * @param Integer volume_level - Volume up to 100%. (200 on VLC so it's x2)
 	 */
-	public synchronized void volume(int volume_level)
+	public void volume(int volume_level)
 	{
 		// If the media player is playable...
 		if(ourMediaPlayer != null && ourMediaPlayer.isPlayable())
@@ -1054,7 +1075,7 @@ public final class MediaPlayer extends TimerTask
 	 * Retrieves if the media player is playing.
 	 * @return Boolean - True if playing, false otherwise.
 	 */
-	public synchronized boolean isPlaying()
+	public boolean isPlaying()
 	{
 		return !paused;
 	}
@@ -1063,7 +1084,7 @@ public final class MediaPlayer extends TimerTask
 	 * Retrieves if the media player is in fast forward.
 	 * @return Boolean - True if fast forward, false otherwise.
 	 */
-	private synchronized boolean isFastFoward()
+	private boolean isFastFoward()
 	{
 		return (ourMediaPlayer != null) && ourMediaPlayer.getRate() > 1f;
 	}
@@ -1073,7 +1094,7 @@ public final class MediaPlayer extends TimerTask
 	 * @param Integer current_percentage - Current position of the seeker bar in relation to the whole time frame of the media.
 	 * @return Long - Time in milliseconds.
 	 */
-    private synchronized final long getPositionFromPercentage(int current_percentage)
+    private final long getPositionFromPercentage(int current_percentage)
     {
     	// Retrieve time in milliseconds by multiplying the current percentage with the total length and dividing by 100.
     	long time_from_percentage = (current_percentage * ourMediaPlayer.getMediaMeta().getLength())/100;
@@ -1101,7 +1122,10 @@ public final class MediaPlayer extends TimerTask
      */
     public static MediaInfo getMediaInfo()
     {
-    	return info;
+		synchronized (info) 
+		{
+			return info;
+		}
     }
     
     /**

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
+import net.eureka.androidcast.foundation.init.ApplicationGlobals;
+
 /**
  * Server logger. Only needs to be instantiated once. Attempts to find the log file via application directory, if not found creates a new one.
  * After the log is set up, the only method needed to be called to write to it is append(StringBuffer... text) below.
@@ -37,7 +39,7 @@ public final class Logger
 			home_path = ((home_path == null) ? System.getenv("HOMEPATH") : home_path);
 			
 			// Create default home/download directory path. 
-			final StringBuffer directory_path = new StringBuffer(system_drive+home_path+File.separator+"Android Cast");
+			final StringBuffer directory_path = new StringBuffer(system_drive+home_path+File.separator+ApplicationGlobals.getName());
 			directory_path.append(LOGGING_FILE);
 			// Open up a buffered stream to the log file, set encoding to UTF-8.
 			BufferedWriter buffered_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(directory_path.toString()), true), "UTF-8"));
