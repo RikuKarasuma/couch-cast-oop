@@ -1,4 +1,4 @@
-package net.eureka.androidcast.player;
+package net.eureka.couchcast.player;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -22,10 +22,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.eureka.androidcast.foundation.init.ApplicationGlobals;
-import net.eureka.androidcast.mediaserver.player.MediaInfo;
-import net.eureka.androidcast.player.control.ActivateWindow;
-import net.eureka.androidcast.player.control.DesktopControl;
+import net.eureka.couchcast.foundation.init.ApplicationGlobals;
+import net.eureka.couchcast.mediaserver.MediaInfo;
+import net.eureka.couchcast.player.control.ActivateWindow;
+import net.eureka.couchcast.player.control.DesktopControl;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;

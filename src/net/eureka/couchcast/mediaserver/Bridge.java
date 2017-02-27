@@ -1,4 +1,4 @@
-package net.eureka.androidcast.mediaserver.player;
+package net.eureka.couchcast.mediaserver;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,11 +6,11 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import net.eureka.androidcast.Logger;
-import net.eureka.androidcast.foundation.config.Configuration;
-import net.eureka.androidcast.foundation.init.NetworkGlobals;
-import net.eureka.androidcast.player.MediaPlayer;
-import net.eureka.androidcast.player.Static;
+import net.eureka.couchcast.Logger;
+import net.eureka.couchcast.foundation.config.Configuration;
+import net.eureka.couchcast.foundation.init.NetworkGlobals;
+import net.eureka.couchcast.player.MediaPlayer;
+import net.eureka.couchcast.player.Static;
 
 public final class Bridge
 {

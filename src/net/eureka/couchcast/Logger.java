@@ -1,11 +1,11 @@
-package net.eureka.androidcast;
+package net.eureka.couchcast;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
-import net.eureka.androidcast.foundation.init.ApplicationGlobals;
+import net.eureka.couchcast.foundation.init.ApplicationGlobals;
 
 /**
  * Server logger. Only needs to be instantiated once. Attempts to find the log file via application directory, if not found creates a new one.

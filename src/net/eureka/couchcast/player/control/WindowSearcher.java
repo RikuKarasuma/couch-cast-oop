@@ -1,8 +1,6 @@
-package net.eureka.androidcast.player.control;
+package net.eureka.couchcast.player.control;
 
 import java.nio.charset.Charset;
-
-import net.eureka.androidcast.player.Static;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -10,6 +8,8 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 import com.sun.jna.win32.StdCallLibrary;
+
+import net.eureka.couchcast.player.Static;
 
 
 public final class WindowSearcher 

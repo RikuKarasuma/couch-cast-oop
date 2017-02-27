@@ -1,8 +1,8 @@
-package net.eureka.androidcast.foundation.init;
+package net.eureka.couchcast.foundation.init;
 
 import java.io.File;
 
-import net.eureka.androidcast.foundation.config.Configuration;
+import net.eureka.couchcast.foundation.config.Configuration;
 
 /**
  * Contains global application variables such as the operating system, application directory (\<USER>\PCCast\),

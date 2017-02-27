@@ -1,4 +1,4 @@
-package net.eureka.androidcast.player;
+package net.eureka.couchcast.player;
 
 import java.io.IOException;
 import java.net.Inet6Address;

@@ -1,4 +1,4 @@
-package net.eureka.androidcast.player.control;
+package net.eureka.couchcast.player.control;
 
 import java.nio.charset.Charset;
 
@@ -7,7 +7,7 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.win32.W32APIOptions;
 
-import net.eureka.androidcast.player.Static;
+import net.eureka.couchcast.player.Static;
  
 public final class ActivateWindow
 {

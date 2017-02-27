@@ -1,4 +1,4 @@
-package net.eureka.androidcast.foundation.config;
+package net.eureka.couchcast.foundation.config;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,10 +6,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import net.eureka.androidcast.Logger;
-import net.eureka.androidcast.player.Static;
-import net.eureka.androidcast.foundation.init.ApplicationGlobals;
-import net.eureka.androidcast.foundation.init.NetworkGlobals;
+import net.eureka.couchcast.Logger;
+import net.eureka.couchcast.foundation.init.ApplicationGlobals;
+import net.eureka.couchcast.foundation.init.NetworkGlobals;
+import net.eureka.couchcast.player.Static;
 
 
 /**

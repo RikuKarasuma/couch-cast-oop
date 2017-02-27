@@ -1,4 +1,4 @@
-package net.eureka.androidcast.foundation.init;
+package net.eureka.couchcast.foundation.init;
 
 import java.net.InetAddress;
 

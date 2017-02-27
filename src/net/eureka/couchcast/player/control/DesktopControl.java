@@ -1,4 +1,4 @@
-package net.eureka.androidcast.player.control;
+package net.eureka.couchcast.player.control;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HWND;

@@ -1,4 +1,4 @@
-package net.eureka.androidcast.mediaserver.player;
+package net.eureka.couchcast.mediaserver;
 
 import java.io.Serializable;
 
