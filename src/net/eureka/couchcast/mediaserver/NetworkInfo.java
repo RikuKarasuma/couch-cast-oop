@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @see MediaBroadcaster
  * @see MediaPlayer
  */
-public final class MediaInfo implements Serializable
+public final class NetworkInfo implements Serializable
 {
 	/**
 	 * 
@@ -49,6 +49,7 @@ public final class MediaInfo implements Serializable
 	 * Long used to determine the current time of the selected media in milliseconds.
 	 */
 	private long time = 0L; 
+	
 			
 	/**
 	 * Integer, used to determine which media file is being played on the play-list with respect
@@ -63,7 +64,7 @@ public final class MediaInfo implements Serializable
 	 * @param long media_length - Total length/time of media.
 	 * @param long media_time - current time of media.
 	 */
-	public MediaInfo(final long media_length, final long media_time)
+	public NetworkInfo(final long media_length, final long media_time)
 	{
 		// Set total length.
 		this.setLength(media_length);
@@ -190,5 +191,4 @@ public final class MediaInfo implements Serializable
 	public void setMusic(boolean music) {
 		this.music = music;
 	}
-	
 }

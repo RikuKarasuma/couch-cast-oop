@@ -23,7 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.eureka.couchcast.foundation.init.ApplicationGlobals;
-import net.eureka.couchcast.mediaserver.MediaInfo;
+import net.eureka.couchcast.mediaserver.NetworkInfo;
 import net.eureka.couchcast.player.control.ActivateWindow;
 import net.eureka.couchcast.player.control.DesktopControl;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
@@ -41,7 +41,7 @@ import uk.co.caprica.vlcj.player.embedded.windows.Win32FullScreenStrategy;
  * media player info through a TimerTask/{@link Timer} scheduled to run every one second.
  * Once a command comes through the {@link MediaReceiver} from the Android client, the {@link MediaReceiver} 
  * interprets what command it is then passes it to the MediaPlayer object for execution. Whatever changes
- * are reflected within the {@link MediaInfo} object every one second update. That info object is then sent
+ * are reflected within the {@link NetworkInfo} object every one second update. That info object is then sent
  * back to the Android Client through the {@link MediaBroadcaster}.
  * <br>
  * <pre>
@@ -89,7 +89,7 @@ import uk.co.caprica.vlcj.player.embedded.windows.Win32FullScreenStrategy;
  * @author Owen McMonagle
  * 
  * @see MediaReceiver
- * @see MediaInfo
+ * @see NetworkInfo
  * @see MediaBroadcaster
  * @see ActivateWindow
  * @see DesktopControl
@@ -152,7 +152,7 @@ public final class MediaPlayer extends TimerTask
 	private CanvasVideoSurface videoSurface = null;
 	
 	/**
-	 * VLCJ event listener, handles media player events/reactions such as when to change {@link MediaInfo} in response to video
+	 * VLCJ event listener, handles media player events/reactions such as when to change {@link NetworkInfo} in response to video
 	 * buffering for example.
 	 */
 	private MediaPlayerEventAdapter eventListener = new MediaPlayerEventAdapter()
@@ -189,7 +189,7 @@ public final class MediaPlayer extends TimerTask
         
 		/**
 		 * When the medias state changes, this method is called with the new player state. This state is then sent
-		 * to the statusDelegate method, where the state will be interpreted and the corresponding {@link MediaInfo}
+		 * to the statusDelegate method, where the state will be interpreted and the corresponding {@link NetworkInfo}
 		 * change will be made.
 		 * 
 		 *  <pre>
@@ -210,7 +210,7 @@ public final class MediaPlayer extends TimerTask
         };
         
         /**
-         * Whenever the seek option is used to seek a new media time, the {@link MediaInfo} will pause until the presumed
+         * Whenever the seek option is used to seek a new media time, the {@link NetworkInfo} will pause until the presumed
          * buffering is completed.
          */
         public final void seekableChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int newSeekable) 
@@ -220,7 +220,7 @@ public final class MediaPlayer extends TimerTask
         };
         
         /**
-         * Sets the new {@link MediaInfo} state from the passed state integer. State changes come from mediaStateChanged.
+         * Sets the new {@link NetworkInfo} state from the passed state integer. State changes come from mediaStateChanged.
          *  <pre>
 		 *  	RECORDED STATES:
 		 *  
@@ -375,10 +375,10 @@ public final class MediaPlayer extends TimerTask
 	};
 	
 	/**
-	 * {@link MediaInfo} object. Contains all the relevant media info that needs to be transported to the Android 
+	 * {@link NetworkInfo} object. Contains all the relevant media info that needs to be transported to the Android 
 	 * client via the {@link MediaBroadcaster}. 
 	 */
-	private static MediaInfo info = new MediaInfo(0, 0);
+	private static NetworkInfo info = new NetworkInfo(0, 0);
 	
 	/**
 	 * {@link Timer} that manages this media players TimerTask. Used to update media info every one second.
@@ -695,7 +695,7 @@ public final class MediaPlayer extends TimerTask
 	}
 	
 	/**
-	 * Updates media info every one second. First it updates the media time, then updates the {@link MediaInfo} object.
+	 * Updates media info every one second. First it updates the media time, then updates the {@link NetworkInfo} object.
 	 * Which is sent to Android client by the {@link MediaBroadcaster}.
 	 */
 	public void updateMediaInfo()
@@ -710,7 +710,7 @@ public final class MediaPlayer extends TimerTask
 	}
 	
 	/**
-	 * Handles the updating of the {@link MediaInfo} object. This object is sent to the Android Clients player as a 
+	 * Handles the updating of the {@link NetworkInfo} object. This object is sent to the Android Clients player as a 
 	 * representation of the media players state. The retrieval of the object is at the clients discretion via {@link MediaBroadcaster}.
 	 * At the moment the client retrieves it every 850ms, leaving 150ms to update the UI. 
 	 */
@@ -723,7 +723,7 @@ public final class MediaPlayer extends TimerTask
 				// If the media info object is equal to null...
 				if(info == null)
 					// Create a new media info object with initial length, current length and name.
-					info = new MediaInfo(ourMediaPlayer.getMediaMeta().getLength(), time);
+					info = new NetworkInfo(ourMediaPlayer.getMediaMeta().getLength(), time);
 				// If the media info object is already created...
 				else
 				{
@@ -907,7 +907,7 @@ public final class MediaPlayer extends TimerTask
 	
 	/**
 	 * Stops the current media from continuing playing, closes the {@link JFrame} and resets
-	 * the media player variables such as time, finished flag and {@link MediaInfo}.
+	 * the media player variables such as time, finished flag and {@link NetworkInfo}.
 	 */
 	public void stop()
 	{
@@ -946,7 +946,7 @@ public final class MediaPlayer extends TimerTask
 	}
 	
 	/**
-	 * Resets media player time, sets finished flag to true and {@link MediaInfo}. Also signals
+	 * Resets media player time, sets finished flag to true and {@link NetworkInfo}. Also signals
 	 * Garbage Collection to make a pass(Not guaranteed).
 	 */
 	private void signalMediaReset()
@@ -1031,7 +1031,7 @@ public final class MediaPlayer extends TimerTask
 	}
 	
 	/**
-	 * Sets the media player status to paused and updates the {@link MediaInfo}.
+	 * Sets the media player status to paused and updates the {@link NetworkInfo}.
 	 */
 	private void setPaused()
 	{
@@ -1045,7 +1045,7 @@ public final class MediaPlayer extends TimerTask
 	}
 	
 	/**
-	 * Sets the media player status to playing and updates the {@link MediaInfo}.
+	 * Sets the media player status to playing and updates the {@link NetworkInfo}.
 	 */
 	private void setPlaying()
 	{
@@ -1118,9 +1118,9 @@ public final class MediaPlayer extends TimerTask
     /**
      * Retrieves the media info.
      * Used by the {@link MediaBroadcaster}.
-     * @return {@link MediaInfo} - Media info representing the status of the media player.
+     * @return {@link NetworkInfo} - Media info representing the status of the media player.
      */
-    public static MediaInfo getMediaInfo()
+    public static NetworkInfo getMediaInfo()
     {
 		synchronized (info) 
 		{

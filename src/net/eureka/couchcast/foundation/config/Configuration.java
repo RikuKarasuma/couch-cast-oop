@@ -79,8 +79,9 @@ public final class Configuration
 			buffered_reader.readLine();
 			// Get name of network interface.
 			String network_interface_name = buffered_reader.readLine();
-			// Set DHCP interface and name.
-			NetworkGlobals.setDhcpNetwork(Static.getInetAddressFromName(network_interface_name));
+			if(NetworkGlobals.getDHCPInterface() == null)
+				// Set DHCP interface and name.
+				NetworkGlobals.setDhcpNetwork(Static.getInetAddressFromName(network_interface_name));
 			// Set minimised.
 			ApplicationGlobals.setMinimizeWindows(is_minimized);
 			ApplicationGlobals.setMusicMode(is_music_mode);

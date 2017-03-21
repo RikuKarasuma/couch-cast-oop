@@ -15,7 +15,7 @@ import net.eureka.couchcast.player.Static;
 public final class Bridge
 {
 	
-	private static final int PORT = 63054, TIMEOUT = 4000, CONNECTION_BACKLOG = 100;
+	private static final int PORT = 63053, CONNECTION_BACKLOG = 1;
 	
 	private static ServerSocket server = null;
 	
@@ -38,7 +38,6 @@ public final class Bridge
 		try
 		{
 			server = new ServerSocket(PORT, CONNECTION_BACKLOG, NetworkGlobals.getDHCPInterface());
-			server.setSoTimeout(TIMEOUT);
 		}
 		catch (IOException e) 
 		{
@@ -141,9 +140,6 @@ public final class Bridge
 			}
 		}
 		
-		
-		/////////////////////// Synchronisation ERROR in Input bridge thread.
-		
 		private static void inputProcessingThread()
 		{
 			new Thread(new Runnable()
@@ -227,11 +223,10 @@ public final class Bridge
 			while(connected)
 				try 
 				{
-					System.out.println("Outputing...");
 					if(!first_write)
 						waitForOppositeRead();
 					output.reset();
-					MediaInfo info = MediaPlayer.getMediaInfo();
+					NetworkInfo info = MediaPlayer.getMediaInfo();
 					output.writeObject(info);
 					output.flush();
 					first_write = false;

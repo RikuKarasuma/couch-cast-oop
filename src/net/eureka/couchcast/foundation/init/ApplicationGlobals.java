@@ -28,8 +28,11 @@ public final class ApplicationGlobals
 	
 	private static final String INSTALL_DIRECTORY =  File.separator + new String(name) + File.separator;
 	
-	private static final String INSTALL_DIRECTORY_PATH = // (Static.is64BitArch()) ? System.getenv("PROGRAMFILES") + 
-			System.getenv("SYSTEMDRIVE") + File.separator + "Program Files" + INSTALL_DIRECTORY;
+	// 64 bit
+	private static final String INSTALL_DIRECTORY_PATH = System.getenv("SYSTEMDRIVE") + File.separator + "Program Files" + INSTALL_DIRECTORY;
+	// 32 bit
+	//private static final String INSTALL_DIRECTORY_PATH = // (Static.is64BitArch()) ? System.getenv("PROGRAMFILES") + 
+		//	System.getenv("SYSTEMDRIVE") + File.separator + ((!Static.is64BitArch()) ? "Program Files" : "Program Files (x86)") + INSTALL_DIRECTORY;
 	
 	public static String getName()
 	{

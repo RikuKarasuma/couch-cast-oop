@@ -7,6 +7,7 @@ import java.net.NetworkInterface;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
+
 /**
  * Contains useful methods that could be common to the whole media server.
  * 
@@ -17,7 +18,25 @@ public final class Static
 {
 	
 	private static final ArrayList<String> INTERFACES = new ArrayList<String>();
-
+	
+	/**
+	 * Used to determine if the computer O.S is 64 or 32 bit. 
+	 * @return Boolean - True if 64bit. False otherwise.
+	 */
+	public static boolean is64BitArch()
+	{
+		boolean is64bit = false;
+		// Checks if O.S is windows...
+		if (System.getProperty("os.name").contains("Windows"))
+			// if so check for 32bit program files which will confirm architecture.
+		    is64bit = (System.getenv("ProgramFiles(x86)") != null);
+		else
+			// if the String 64 doesn't exist in property os.arch then 32bit is confirmed. Otherwise the arch is 64 bit.
+		    is64bit = (System.getProperty("os.arch").indexOf("64") != -1);
+		
+		// Return arch calculation.
+		return is64bit;
+	}
 	
 	/**
 	 * Used to compare two byte sequences against each other that each have the length of 2.
@@ -49,12 +68,16 @@ public final class Static
 	 */
 	public static InetAddress getInetAddressFromName(String name)
 	{
-		ArrayList<InetAddress> valid_addresses = getInetAddresses();
-		
-		for(int i = 0; i < valid_addresses.size(); i ++)
-			if(INTERFACES.get(i).equals(name))
-				return valid_addresses.get(i);
-		
+		if(!name.isEmpty())
+		{
+			ArrayList<InetAddress> valid_addresses = getInetAddresses();
+			
+			System.out.println("Valid addresses:"+ valid_addresses.size());
+			
+			for(int i = 0; i < valid_addresses.size(); i ++)
+				if(INTERFACES.get(i).equals(name))
+					return valid_addresses.get(i);
+		}
 		return null;
 	}
 	
@@ -71,7 +94,7 @@ public final class Static
 			ArrayList<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
 			
 			for (NetworkInterface net_interface : interfaces) 
-				if(!INTERFACES.contains(net_interface.toString()) && net_interface.isUp() && !net_interface.isVirtual() && !net_interface.isLoopback() && net_interface.supportsMulticast())
+				if(!INTERFACES.contains(net_interface.toString().split(":")[1]) && net_interface.isUp() && !net_interface.isVirtual() && !net_interface.isLoopback() && net_interface.supportsMulticast())
 				{
 					// iterate over the addresses associated with the interface
 					ArrayList<InetAddress> addresses = Collections.list(net_interface.getInetAddresses());
@@ -79,15 +102,14 @@ public final class Static
 					{
 						InetAddress address = addresses.get(i);
 						
-						// look only for ipv4 and reachable addresses. 
+						// look only for ipv4 addresses
 						if (!(address instanceof Inet6Address) && address.isReachable(3000))
 						{
-							String name = net_interface.toString();
+							String name = net_interface.toString(), parsed = name.split(":")[1];
 							System.out.format("["+i+"] ni: %s\n", name);
-							// Add valid interface address.
 							valid_addresses.add(address);
 							// Add name to interface name list
-							INTERFACES.add(name.split(":")[1]);
+							INTERFACES.add(parsed);
 							// Make i the size limit to exit loop.
 							i = addresses.size();
 						}
